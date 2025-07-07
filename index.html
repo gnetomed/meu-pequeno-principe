@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>O Pequeno Príncipe - Uma Jornada Interativa</title>
+    <!-- Carrega o Tailwind CSS para estilização responsiva e moderna -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Estilos personalizados para a aplicação */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f8ff; /* Azul claro para remeter ao céu */
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        .header-bg {
+            background-color: #2a6f97; /* Azul mais escuro para o cabeçalho */
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .nav-link {
+            transition: color 0.3s ease;
+        }
+        .nav-link:hover {
+            color: #ffcc00; /* Amarelo dourado para destaque */
+        }
+        .section-title {
+            color: #2a6f97;
+            border-bottom: 2px solid #ffcc00;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .card {
+            background-color: white;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .expandable-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out, opacity 0.5s ease-out;
+            opacity: 0;
+        }
+        .expandable-content.expanded {
+            max-height: 1000px; /* Valor grande o suficiente para a maioria dos conteúdos */
+            opacity: 1;
+            transition: max-height 0.7s ease-in, opacity 0.7s ease-in;
+        }
+        .character-card {
+            background-color: white;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            position: absolute; /* Posicionamento absoluto para sobrepor o mapa */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 600px;
+            z-index: 100; /* Acima de outros elementos */
+            display: none; /* Escondido por padrão */
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            padding: 1.5rem;
+        }
+        .character-card.active {
+            display: block;
+            opacity: 1;
+        }
+        .character-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            position: relative; /* Para o posicionamento absoluto dos cards de personagem */
+            min-height: 500px; /* Garante espaço para os cards de personagem */
+        }
+        .character-item {
+            cursor: pointer;
+            text-align: center;
+            transition: transform 0.2s ease;
+        }
+        .character-item:hover {
+            transform: scale(1.05);
+        }
+        .character-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 3px solid #ffcc00;
+            margin: 0 auto 0.5rem;
+        }
+        .close-button {
+            background-color: #ef4444; /* Vermelho para o botão de fechar */
+            color: white;
+            border-radius: 9999px; /* Botão redondo */
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .close-button:hover {
+            background-color: #dc2626;
+        }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* Fundo escuro semi-transparente */
+            z-index: 90;
+            display: none; /* Escondido por padrão */
+        }
+        .overlay.active {
+            display: block;
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <!-- Cabeçalho da página -->
+    <header class="header-bg p-4 shadow-md">
+        <div class="container flex flex-col md:flex-row justify-between items-center">
+            <h1 class="text-3xl font-bold mb-4 md:mb-0">O Pequeno Príncipe</h1>
+            <nav>
+                <ul class="flex space-x-6 text-lg">
+                    <li><a href="#curiosities" class="nav-link">Curiosidades</a></li>
+                    <li><a href="#meaning" class="nav-link">Significado</a></li>
+                    <li><a href="#characters" class="nav-link">Personagens</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container py-8">
+        <!-- Seção: Curiosidades -->
+        <section id="curiosities" class="mb-12">
+            <h2 class="section-title text-4xl font-bold mb-6 text-center">Curiosidades</h2>
+            <div class="card p-6">
+                <p class="mb-4">"O Pequeno Príncipe" (Le Petit Prince) é uma novela escrita e ilustrada pelo aristocrata, escritor e aviador francês Antoine de Saint-Exupéry. Publicado em 1943, é um dos livros mais traduzidos e vendidos do mundo, cativando leitores de todas as idades com sua simplicidade e profundidade.</p>
+                <p class="mb-4">A obra é uma fábula poética que, sob a aparência de um livro infantil, aborda temas como a solidão, a amizade, o amor e a perda. Saint-Exupéry dedicou o livro a Léon Werth, seu melhor amigo, quando ele era criança, e depois a Léon Werth adulto, pedindo desculpas por dedicar um livro a um adulto.</p>
+                
+                <h3 class="text-2xl font-semibold mt-6 mb-3 text-blue-700">A Conexão Brasileira: Maraú, Bahia</h3>
+                <p class="mb-4">Uma curiosidade fascinante e muitas vezes pouco conhecida é a forte ligação de Antoine de Saint-Exupéry com o Brasil, especialmente com a região de Maraú, na Bahia. Antes de escrever "O Pequeno Príncipe", Saint-Exupéry trabalhou como piloto para a Aéropostale, uma companhia de correio aéreo francesa.</p>
+                <p class="mb-4">Entre os anos de 1929 e 1931, Saint-Exupéry passou um tempo significativo no Brasil, atuando como diretor da linha aérea na América do Sul. Ele frequentemente pousava em diversas cidades costeiras, incluindo Natal, Recife, Salvador e, notavelmente, na Península de Maraú, no sul da Bahia. Acredita-se que as paisagens exuberantes, as dunas e o céu estrelado da Bahia, especialmente de Maraú, tenham servido de inspiração para alguns dos cenários e reflexões presentes em "O Pequeno Príncipe".</p>
+                <p class="mb-4">A vastidão do céu e a solidão das paisagens nordestinas, que ele experimentava em seus voos, podem ter contribuído para a atmosfera de introspecção e maravilha que permeia a obra. Embora não haja uma menção direta a Maraú no livro, a vivência do autor nessas terras certamente enriqueceu seu repertório de observações sobre a natureza humana e o universo, elementos tão presentes em sua obra-prima.</p>
+                
+                <button class="toggle-content mt-4 px-6 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors">Ver Mais</button>
+                <div class="expandable-content">
+                    <p class="mt-4">Outras curiosidades:</p>
+                    <ul class="list-disc list-inside ml-4">
+                        <li>O manuscrito original e as ilustrações foram criados por Saint-Exupéry em Nova York, onde ele viveu durante a Segunda Guerra Mundial.</li>
+                        <li>O asteroide B-612, lar do Pequeno Príncipe, é uma referência à infância do autor e à sua imaginação.</li>
+                        <li>A rosa do Pequeno Príncipe é frequentemente interpretada como uma representação de sua esposa, Consuelo de Saint-Exupéry, com quem ele teve um relacionamento complexo.</li>
+                        <li>O livro foi adaptado para diversas mídias, incluindo filmes, peças de teatro, óperas e séries animadas.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção: Significado do Livro -->
+        <section id="meaning" class="mb-12">
+            <h2 class="section-title text-4xl font-bold mb-6 text-center">Significado do Livro</h2>
+            <div class="card p-6">
+                <p class="mb-4">"O Pequeno Príncipe" é muito mais do que uma história infantil; é uma profunda alegoria sobre a vida, o amor e a busca por significado. Através de encontros com personagens peculiares em diferentes planetas, o Pequeno Príncipe nos ensina sobre a essência das relações humanas e a importância de ver o mundo com o coração.</p>
+                <p class="mb-4">A obra critica a superficialidade do mundo adulto, apegado a números e posses, e exalta a pureza e a sabedoria da infância. A frase "Só se vê bem com o coração. O essencial é invisível aos olhos" encapsula a mensagem central do livro: a verdadeira beleza e o valor das coisas estão além do que podemos perceber com nossos sentidos.</p>
+                <button class="toggle-content mt-4 px-6 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors">Ver Mais</button>
+                <div class="expandable-content">
+                    <h3 class="text-2xl font-semibold mt-6 mb-3 text-blue-700">Reflexões Filosóficas</h3>
+                    <ul class="list-disc list-inside ml-4">
+                        <li>**A Amizade e a Responsabilidade:** A relação com a Raposa ensina ao Pequeno Príncipe sobre a importância de "cativar" e a responsabilidade que vem com o amor e a amizade.</li>
+                        <li>**A Singularidade do Amor:** A Rosa, com suas peculiaridades e imperfeições, representa o amor verdadeiro e único, que se torna especial pelo tempo e dedicação a ele.</li>
+                        <li>**A Crítica ao Mundo Adulto:** Os habitantes dos planetas visitados pelo Príncipe simbolizam os vícios e a falta de propósito dos adultos, que esqueceram a essência da vida.</li>
+                        <li>**A Morte e o Renascimento:** O final do livro, embora melancólico, sugere um ciclo de transformação e a eternidade do espírito.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção: Personagens -->
+        <section id="characters" class="mb-12 relative">
+            <h2 class="section-title text-4xl font-bold mb-6 text-center">Personagens</h2>
+            <div class="card p-6 min-h-[400px] flex flex-col items-center justify-center">
+                <p class="text-center mb-6 text-lg">Clique ou toque em um personagem para saber mais sobre ele e seu simbolismo!</p>
+                <div class="character-grid w-full max-w-4xl mx-auto">
+                    <!-- Personagem: Pequeno Príncipe -->
+                    <div class="character-item" data-character="pequeno-principe">
+                        <img src="https://placehold.co/80x80/2a6f97/ffffff?text=PP" alt="O Pequeno Príncipe" class="character-image">
+                        <p class="font-semibold text-blue-800">Pequeno Príncipe</p>
+                    </div>
+                    <!-- Personagem: A Rosa -->
+                    <div class="character-item" data-character="rosa">
+                        <img src="https://placehold.co/80x80/e57373/ffffff?text=Rosa" alt="A Rosa" class="character-image">
+                        <p class="font-semibold text-red-600">A Rosa</p>
+                    </div>
+                    <!-- Personagem: A Raposa -->
+                    <div class="character-item" data-character="raposa">
+                        <img src="https://placehold.co/80x80/ffcc00/333333?text=Raposa" alt="A Raposa" class="character-image">
+                        <p class="font-semibold text-yellow-700">A Raposa</p>
+                    </div>
+                    <!-- Personagem: O Aviador -->
+                    <div class="character-item" data-character="aviador">
+                        <img src="https://placehold.co/80x80/607d8b/ffffff?text=Aviador" alt="O Aviador" class="character-image">
+                        <p class="font-semibold text-gray-700">O Aviador</p>
+                    </div>
+                    <!-- Personagem: O Rei -->
+                    <div class="character-item" data-character="rei">
+                        <img src="https://placehold.co/80x80/9c27b0/ffffff?text=Rei" alt="O Rei" class="character-image">
+                        <p class="font-semibold text-purple-700">O Rei</p>
+                    </div>
+                    <!-- Personagem: O Vaidoso -->
+                    <div class="character-item" data-character="vaidoso">
+                        <img src="https://placehold.co/80x80/ff9800/ffffff?text=Vaidoso" alt="O Vaidoso" class="character-image">
+                        <p class="font-semibold text-orange-700">O Vaidoso</p>
+                    </div>
+                    <!-- Personagem: O Bêbado -->
+                    <div class="character-item" data-character="bebado">
+                        <img src="https://placehold.co/80x80/795548/ffffff?text=Bêbado" alt="O Bêbado" class="character-image">
+                        <p class="font-semibold text-amber-700">O Bêbado</p>
+                    </div>
+                    <!-- Personagem: O Acendedor de Lampiões -->
+                    <div class="character-item" data-character="acendedor">
+                        <img src="https://placehold.co/80x80/4caf50/ffffff?text=Lampiões" alt="O Acendedor de Lampiões" class="character-image">
+                        <p class="font-semibold text-green-700">Acendedor</p>
+                    </div>
+                    <!-- Personagem: O Geógrafo -->
+                    <div class="character-item" data-character="geografo">
+                        <img src="https://placehold.co/80x80/00bcd4/ffffff?text=Geógrafo" alt="O Geógrafo" class="character-image">
+                        <p class="font-semibold text-cyan-700">O Geógrafo</p>
+                    </div>
+                </div>
+
+                <!-- Overlay para escurecer o fundo quando um card de personagem estiver ativo -->
+                <div class="overlay" id="overlay"></div>
+
+                <!-- Cards de Detalhes dos Personagens (inicialmente ocultos) -->
+                <div id="pequeno-principe-card" class="character-card">
+                    <span class="close-button">X</span>
+                    <h3 class="text-3xl font-bold mb-4 text-blue-700">O Pequeno Príncipe</h3>
+                    <p class="mb-3">O protagonista da história, um menino curioso e ingênuo que viaja de planeta em planeta em busca de amigos e compreensão. Ele simboliza a pureza, a inocência e a capacidade de ver o mundo com os olhos do coração, questionando as prioridades dos adultos.</p>
+                    <p class="italic text-gray-600">"Foi o tempo que dedicaste à tua rosa que a fez tão importante."</p>
+                </div>
+
+                <div id="rosa-card" class="character-card">
+                    <span class="close-button">X</span>
+                    <h3 class="text-3xl font-bold mb-4 text-red-600">A Rosa</h3>
+                    <p class="mb-3">A rosa do Pequeno Príncipe é bela, mas também vaidosa e exigente. Ela representa o amor, com suas alegrias e desafios, e a singularidade de cada relacionamento. Através dela, o Príncipe aprende sobre dedicação e a importância de cuidar do que se ama.</p>
+                    <p class="italic text-gray-600">"Tu te tornas eternamente responsável por aquilo que cativas."</p>
+                </div>
+
+                <div id="raposa-card" class="character-card">
+                    <span class="close-button">X</span>
+                    <h3 class="text-3xl font-bold mb-4 text-yellow-700">A Raposa</h3>
+                    <p class="mb-3">A Raposa é a personagem que ensina ao Pequeno Príncipe o verdadeiro significado da amizade e do "cativar". Ela representa a sabedoria, a paciência e a importância de criar laços profundos e únicos com os outros, tornando-os especiais.</p>
+                    <p class="italic text-gray-600">"Tu és responsável por aquilo que cativas."</p>
+                </div>
+
+                <div id="aviador-card" class="character-card">
+                    <span class="close-button">X</span>
+                    <h3 class="text-3xl font-bold mb-4 text-gray-700">O Aviador</h3>
+                    <p class="mb-3">O narrador da história, um adulto que se sente incompreendido pelos outros adultos e que, após um acidente no deserto, encontra o Pequeno Príncipe. Ele representa a criança interior que ainda existe em cada adulto e a busca por um sentido mais profundo na vida.</p>
+                    <p class="italic text-gray-600">"As pessoas grandes nunca compreendem nada sozinhas, e é cansativo para as crianças ter de lhes dar explicações sem cessar."</p>
+                </div>
+
+                <div id="rei-card" class="character-card">
+                    <span class="close-button">X</span>
+                    <h3 class="text-3xl font-bold mb-4 text-purple-700">O Rei</h3>
+                    <p class="mb-3">O Rei habita um planeta onde ele é o único habitante e acredita governar sobre tudo. Ele simboliza a vaidade do poder e a ilusão de controle, mostrando como a autoridade sem súditos é vazia.</p>
+                    <p class="italic text-gray-600">"É muito mais difícil julgar a si mesmo do que julgar os outros."</p>
+                </div>
+
+                <div id="vaidoso-card" class="character-card">
+                    <span class="close-button">X</span>
+                    <h3 class="text-3xl font-bold mb-4 text-orange-700">O Vaidoso</h3>
+                    <p class="mb-3">O Vaidoso vive em um planeta onde só se importa em ser admirado. Ele representa a busca incessante por reconhecimento e a superficialidade da admiração vazia, que não traz verdadeira satisfação.</p>
+                    <p class="italic text-gray-600">"Admirar significa reconhecer que sou o homem mais belo, mais bem vestido, mais rico e mais inteligente do planeta."</p>
+                </div>
+
+                <div id="bebado-card" class="character-card">
+                    <span class="close-button">X</span>
+                    <h3 class="text-3xl font-bold mb-4 text-amber-700">O Bêbado</h3>
+                    <p class="mb-3">O Bêbado bebe para esquecer que tem vergonha de beber. Ele simboliza o ciclo vicioso e a fuga dos problemas através da negação, mostrando a futilidade de tentar escapar da realidade.</p>
+                    <p class="italic text-gray-600">"Bebo para esquecer que tenho vergonha de beber."</p>
+                </div>
+
+                <div id="acendedor-card" class="character-card">
+                    <span class="close-button">X</span>
+                    <h3 class="text-3xl font-bold mb-4 text-green-700">O Acendedor de Lampiões</h3>
+                    <p class="mb-3">O Acendedor de Lampiões segue uma ordem sem questionar, acendendo e apagando seu lampião a cada minuto. Ele representa a obediência cega à rotina e a falta de propósito em um trabalho repetitivo e sem sentido, mas também a lealdade e o cumprimento do dever.</p>
+                    <p class="italic text-gray-600">"É o único que não me parece ridículo. Talvez porque se ocupe de outra coisa que não de si mesmo."</p>
+                </div>
+
+                <div id="geografo-card" class="character-card">
+                    <span class="close-button">X</span>
+                    <h3 class="text-3xl font-bold mb-4 text-cyan-700">O Geógrafo</h3>
+                    <p class="mb-3">O Geógrafo registra montanhas e oceanos, mas nunca os explora pessoalmente. Ele simboliza o conhecimento teórico desconectado da experiência prática, e a limitação de se basear apenas em relatos de terceiros.</p>
+                    <p class="italic text-gray-600">"Um geógrafo é muito importante para andar por aí. Ele não sai de seu escritório."</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Rodapé da página -->
+    <footer class="bg-gray-800 text-white p-6 text-center text-sm">
+        <p>&copy; 2025 O Pequeno Príncipe - Projeto Interativo. Todos os direitos reservados.</p>
+        <p>Desenvolvido com carinho para explorar o universo de Saint-Exupéry.</p>
+    </footer>
+
+    <script>
+        // JavaScript para interatividade
+        document.addEventListener('DOMContentLoaded', () => {
+            // Seleciona todos os botões de alternância de conteúdo
+            const toggleButtons = document.querySelectorAll('.toggle-content');
+
+            // Adiciona um ouvinte de evento de clique a cada botão
+            toggleButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // Encontra o elemento de conteúdo expansível mais próximo
+                    const content = button.nextElementSibling;
+                    // Alterna a classe 'expanded' para mostrar/esconder o conteúdo
+                    content.classList.toggle('expanded');
+                    // Altera o texto do botão
+                    if (content.classList.contains('expanded')) {
+                        button.textContent = 'Ver Menos';
+                    } else {
+                        button.textContent = 'Ver Mais';
+                    }
+                });
+            });
+
+            // Lógica para os cards de personagens
+            const characterItems = document.querySelectorAll('.character-item');
+            const characterCards = document.querySelectorAll('.character-card');
+            const overlay = document.getElementById('overlay');
+
+            characterItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const characterId = item.dataset.character; // Obtém o ID do personagem
+                    const targetCard = document.getElementById(`${characterId}-card`);
+
+                    // Esconde todos os cards e o overlay primeiro
+                    characterCards.forEach(card => card.classList.remove('active'));
+                    overlay.classList.remove('active');
+
+                    // Mostra o card do personagem clicado e o overlay
+                    if (targetCard) {
+                        targetCard.classList.add('active');
+                        overlay.classList.add('active');
+                    }
+                });
+            });
+
+            // Adiciona ouvinte de evento para fechar os cards
+            const closeButtons = document.querySelectorAll('.character-card .close-button');
+            closeButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // Esconde o card pai e o overlay
+                    button.closest('.character-card').classList.remove('active');
+                    overlay.classList.remove('active');
+                });
+            });
+
+            // Fecha o card ao clicar no overlay
+            overlay.addEventListener('click', () => {
+                characterCards.forEach(card => card.classList.remove('active'));
+                overlay.classList.remove('active');
+            });
+
+            // Lógica para navegação suave
+            document.querySelectorAll('nav a').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault(); // Previne o comportamento padrão do link
+
+                    const targetId = this.getAttribute('href'); // Obtém o ID da seção
+                    const targetElement = document.querySelector(targetId); // Encontra o elemento
+
+                    if (targetElement) {
+                        // Rola suavemente até a seção
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
